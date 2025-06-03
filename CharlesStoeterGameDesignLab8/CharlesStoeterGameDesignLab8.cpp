@@ -158,11 +158,30 @@ int main() {
                     if (angle < rotation_target) angle = rotation_target; // Clamp
                 }
 
+
+
+
+
                 // Stop rotating once we've reached the target angle
                 if (angle == rotation_target) {
                     rotating = false;
+
+                    // Reverse movement direction
+                    bee_dx = -bee_dx;
+                    bee_dy = -bee_dy;
+
+                    // Update direction enum
+                    if (bee_dx > 0) direction = RIGHT;
+                    else if (bee_dx < 0) direction = LEFT;
+                    else if (bee_dy > 0) direction = DOWN;
+                    else if (bee_dy < 0) direction = UP;
+
                     moving = true; // Resume movement
                 }
+
+
+
+
             }
             else if (moving) {
                 bee_x += bee_dx;
