@@ -100,6 +100,7 @@ int main() {
     
     al_convert_mask_to_alpha(bee, al_map_rgb(255, 255, 255));
 
+    al_convert_bitmap(bee);
 
 
     // Draw background and bee for a simple test
@@ -192,8 +193,40 @@ int main() {
         if (redraw && al_is_event_queue_empty(event_queue)) {
             redraw = false;
 
+
+            // Clear and draw background
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+
+
             al_draw_bitmap(background, 0, 0, 0);
-            al_draw_bitmap(bee, bee_x, bee_y, 0); // (We'll replace this with flip/direction logic later)
+
+
+
+            // Draw bee based on direction
+            float draw_angle = 0.0;
+
+            if (direction == UP) {
+                draw_angle = 0.0;
+            }
+            else if (direction == DOWN) {
+                draw_angle = ALLEGRO_PI; // 180 degrees
+            }
+            else if (direction == LEFT) {
+                draw_angle = -ALLEGRO_PI / 2; // -90 degrees
+            }
+            else if (direction == RIGHT) {
+                draw_angle = ALLEGRO_PI / 2; // 90 degrees
+            }
+
+            al_draw_rotated_bitmap(bee,
+                BEE_SIZE / 2, BEE_SIZE / 2,
+                bee_x + BEE_SIZE / 2, bee_y + BEE_SIZE / 2,
+                draw_angle, 0);
+
+
+
+
+
             al_flip_display();
         }
     }
@@ -202,11 +235,16 @@ int main() {
 
 
 
-    al_rest(3.0); // Pause to see the images
+   
 
     // Cleanup
     al_destroy_bitmap(background);
     al_destroy_bitmap(bee);
     al_destroy_display(display);
+
+    al_destroy_event_queue(event_queue);
+    al_destroy_timer(timer);
+
+
     return 0;
 }
