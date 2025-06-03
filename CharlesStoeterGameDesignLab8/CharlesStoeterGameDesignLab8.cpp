@@ -17,6 +17,10 @@ bool moving = true;
 
 const int BEE_SIZE = 128;
 
+bool rotating = false;
+float rotation_target = 0.0f; // Angle we're rotating toward
+float rotation_step = 0.1f;
+
 
 enum Direction { RIGHT, LEFT, UP, DOWN };
 Direction direction = RIGHT;
@@ -141,12 +145,40 @@ int main() {
         if (ev.type == ALLEGRO_EVENT_TIMER) {
 
 
-            if (moving) {
+            if (rotating) {
 
+
+                // Smooth rotation toward target angle
+                if (angle < rotation_target) {
+                    angle += rotation_step;
+                    if (angle > rotation_target) angle = rotation_target; // Clamp
+                }
+                else if (angle > rotation_target) {
+                    angle -= rotation_step;
+                    if (angle < rotation_target) angle = rotation_target; // Clamp
+                }
+
+                // Stop rotating once we've reached the target angle
+                if (angle == rotation_target) {
+                    rotating = false;
+                    moving = true; // Resume movement
+                }
+            }
+            else if (moving) {
                 bee_x += bee_dx;
                 bee_y += bee_dy;
 
+                // Check for screen boundaries
+                if (bee_x <= 0 || bee_x >= SCREEN_W - BEE_SIZE ||
+                    bee_y <= 0 || bee_y >= SCREEN_H - BEE_SIZE) {
+
+                    moving = false;        // Stop movement
+                    rotating = true;       // Begin rotating
+                    rotation_target = angle + ALLEGRO_PI; // Set target angle (180° turn)
+                }
             }
+
+
             redraw = true;
         }
 
@@ -164,21 +196,25 @@ int main() {
                 bee_dx = 2.0;
                 bee_dy = 0.0;
                 direction = RIGHT;
+                angle = ALLEGRO_PI / 2;
             }
             else if (ev.keyboard.keycode == ALLEGRO_KEY_LEFT) {
                 bee_dx = -2.0;
                 bee_dy = 0.0;
                 direction = LEFT;
+                angle = -ALLEGRO_PI / 2;
             }
             else if (ev.keyboard.keycode == ALLEGRO_KEY_UP) {
                 bee_dx = 0.0;
                 bee_dy = -2.0;
                 direction = UP;
+                angle = 0;
             }
             else if (ev.keyboard.keycode == ALLEGRO_KEY_DOWN) {
                 bee_dx = 0.0;
                 bee_dy = 2.0;
                 direction = DOWN;
+                angle = ALLEGRO_PI;
             }
         }
 
@@ -202,26 +238,10 @@ int main() {
 
 
 
-            // Draw bee based on direction
-            float draw_angle = 0.0;
-
-            if (direction == UP) {
-                draw_angle = 0.0;
-            }
-            else if (direction == DOWN) {
-                draw_angle = ALLEGRO_PI; // 180 degrees
-            }
-            else if (direction == LEFT) {
-                draw_angle = -ALLEGRO_PI / 2; // -90 degrees
-            }
-            else if (direction == RIGHT) {
-                draw_angle = ALLEGRO_PI / 2; // 90 degrees
-            }
-
             al_draw_rotated_bitmap(bee,
                 BEE_SIZE / 2, BEE_SIZE / 2,
                 bee_x + BEE_SIZE / 2, bee_y + BEE_SIZE / 2,
-                draw_angle, 0);
+                angle, 0);
 
 
 
