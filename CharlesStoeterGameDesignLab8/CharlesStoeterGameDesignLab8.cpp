@@ -130,41 +130,59 @@ int main() {
     bool running = true;
 
     while (running) {
+
+
         ALLEGRO_EVENT ev;
+
         al_wait_for_event(event_queue, &ev);
 
         // TIMER: Update bee's position if it's moving
         if (ev.type == ALLEGRO_EVENT_TIMER) {
+
+
             if (moving) {
+
                 bee_x += bee_dx;
                 bee_y += bee_dy;
+
             }
             redraw = true;
         }
 
         // KEYBOARD INPUT
         else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-            switch (ev.keyboard.keycode) {
-            case ALLEGRO_KEY_ESCAPE:
+
+
+            if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 running = false;
-                break;
-            case ALLEGRO_KEY_SPACE:
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE) {
                 moving = !moving;
-                break;
-            case ALLEGRO_KEY_RIGHT:
-                bee_dx = 2.0; bee_dy = 0;
-                break;
-            case ALLEGRO_KEY_LEFT:
-                bee_dx = -2.0; bee_dy = 0;
-                break;
-            case ALLEGRO_KEY_UP:
-                bee_dx = 0; bee_dy = -2.0;
-                break;
-            case ALLEGRO_KEY_DOWN:
-                bee_dx = 0; bee_dy = 2.0;
-                break;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_RIGHT) {
+                bee_dx = 2.0;
+                bee_dy = 0.0;
+                direction = RIGHT;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_LEFT) {
+                bee_dx = -2.0;
+                bee_dy = 0.0;
+                direction = LEFT;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_UP) {
+                bee_dx = 0.0;
+                bee_dy = -2.0;
+                direction = UP;
+            }
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_DOWN) {
+                bee_dx = 0.0;
+                bee_dy = 2.0;
+                direction = DOWN;
             }
         }
+
+
+
 
         else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             running = false;
